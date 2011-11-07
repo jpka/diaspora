@@ -1,6 +1,9 @@
 var success = ("<%= escape_javascript(@result[:success]) %>" === "1" ? true : false);
 if (success) {
-  $("#followed_tags_listing").html("<%= escape_javascript(render 'tags/followed_tags_listings') %>");
+  var listing = $("<div/>").html("<%= escape_javascript(render 'tags/followed_tags_listings') %>");
+  var ul = $("#followed_tags_listing ul.sub_nav");
+  ul.find("li.unfollow").remove();
+  ul.prepend(listing.find("li.unfollow"));
 }
 Diaspora.page.flashMessages.render({
   success: success,
