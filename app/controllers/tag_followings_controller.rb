@@ -19,12 +19,22 @@ class TagFollowingsController < ApplicationController
     @tag_following = current_user.tag_followings.new(:tag_id => @tag.id)
 
     if @tag_following.save
-      flash[:notice] = I18n.t('tag_followings.create.success', :name => name_normalized)
+      success = true
     else
-      flash[:error] = I18n.t('tag_followings.create.failure', :name => name_normalized)
+      success = false
     end
-
-    redirect_to :back
+    msg = I18n.t('tag_followings.create.' + (success ? 'success' : 'failure'), :name => name_normalized)
+    
+    respond_to do |format|
+      format.html { 
+        flash[(success ? :notice : :error)] = msg
+        redirect_to :back
+      }
+      format.js {
+        @result = { :success => success ? '1' : '0', :msg => msg }
+        render 'tags/create'
+      }
+    end
   end
 
   # DELETE /tag_followings/1

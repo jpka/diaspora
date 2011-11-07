@@ -1,0 +1,8 @@
+var success = ("<%= escape_javascript(@result[:success]) %>" === "1" ? true : false);
+if (success) {
+  $("#followed_tags_listing").html("<%= escape_javascript(render 'tags/followed_tags_listings') %>");
+}
+Diaspora.page.flashMessages.render({
+  success: success,
+  notice: "<%= escape_javascript(@result[:msg]) %>"
+});
