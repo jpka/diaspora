@@ -41,3 +41,11 @@ Feature: posting
     And I follow "unfollow_boss"
     And I wait for the ajax to finish
     Then I should not see "#tag-following-boss" within ".left_nav"
+
+  Scenario: can start following a tag from the homepage
+    When I go to the home page
+    And I preemptively confirm the alert
+    And I fill in ".tag_input" with "sometag"
+    And I click ".left_nav .button"
+    And I wait for the ajax to finish
+    Then I should see "#tag-following-sometag" within ".left_nav"
