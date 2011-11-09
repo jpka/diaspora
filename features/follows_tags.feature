@@ -33,7 +33,8 @@ Feature: posting
     And I press "Following #boss"
     And I go to the home page
     Then I should not see "#boss" within ".left_nav"
-
+    
+  @stop
   Scenario: can stop following a tag from the homepage
     When I go to the home page
     And I preemptively confirm the alert

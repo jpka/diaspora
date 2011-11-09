@@ -31,8 +31,8 @@ class TagFollowingsController < ApplicationController
         redirect_to :back
       }
       format.js {
-        @result = { :success => success ? '1' : '0', :msg => msg }
-        render 'tags/create'
+        @data = { :action => 'create', :success => success ? '1' : '0', :msg => msg }
+        render 'tags/update'
       }
     end
   end
@@ -43,23 +43,28 @@ class TagFollowingsController < ApplicationController
     @tag = ActsAsTaggableOn::Tag.find_by_name(params[:name])
     @tag_following = current_user.tag_followings.where(:tag_id => @tag.id).first
     if @tag_following && @tag_following.destroy
-      @tag_unfollowed = true
+      success = true
     else
-      @tag_unfollowed = false
+      success = false
     end
 
-    if params[:remote]
-      respond_to do |format|
-        format.all {}
-        format.js { render 'tags/update' }
-      end
-    else
-      if @tag_unfollowed
-        flash[:notice] = I18n.t('tag_followings.destroy.success', :name => params[:name])
-      else
-        flash[:error] = I18n.t('tag_followings.destroy.failure', :name => params[:name])
-      end
-      redirect_to tag_path(:name => params[:name])
+    respond_to do |format|
+      format.html {
+        if success
+          flash[:notice] = I18n.t('tag_followings.destroy.success', :name => params[:name])
+        else
+          flash[:error] = I18n.t('tag_followings.destroy.failure', :name => params[:name])
+        end
+        redirect_to tag_path(:name => params[:name])  
+      }
+      format.js { 
+        @data = {
+          :action => 'destroy',
+          :success => success ? '1' : '0',
+          :msg => I18n.t(success ? 'tags.wasnt_that_interesting' : 'tag_followings.destroy.failure')
+        }
+        render 'tags/update'
+      }
     end
   end
 
