@@ -230,3 +230,7 @@ end
 Then /^I should not see ajax loader on deletion link place$/ do
   page.evaluate_script("$('.hide_loader').first().css('display')").should == "none"
 end
+
+And /^(?:|I )focus "([^"]*)"(?: within "([^"]*)")?$/ do |selector, scope|
+  page.execute_script("$('#{selector}').focus()")
+end
