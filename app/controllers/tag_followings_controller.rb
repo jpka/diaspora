@@ -18,23 +18,7 @@ class TagFollowingsController < ApplicationController
     @tag = ActsAsTaggableOn::Tag.find_or_create_by_name(name_normalized)
     @tag_following = current_user.tag_followings.new(:tag_id => @tag.id)
 
-    if @tag_following.save
-      success = true
-    else
-      success = false
-    end
-    msg = I18n.t('tag_followings.create.' + (success ? 'success' : 'failure'), :name => name_normalized)
-    
-    respond_to do |format|
-      format.html { 
-        flash[(success ? :notice : :error)] = msg
-        redirect_to :back
-      }
-      format.js {
-        @data = { :action => 'create', :success => success ? '1' : '0', :msg => msg }
-        render 'tags/update'
-      }
-    end
+    respond(@tag_following.save, 'create', :back)
   end
 
   # DELETE /tag_followings/1
@@ -42,27 +26,20 @@ class TagFollowingsController < ApplicationController
   def destroy
     @tag = ActsAsTaggableOn::Tag.find_by_name(params[:name])
     @tag_following = current_user.tag_followings.where(:tag_id => @tag.id).first
-    if @tag_following && @tag_following.destroy
-      success = true
-    else
-      success = false
-    end
 
+    respond(@tag_following && @tag_following.destroy, 'destroy', tag_path(:name => params[:name]))
+  end
+
+  def respond(success, action, destination)
+    msg = I18n.t('tag_followings.' + action + "." + (success ? 'success' : 'failure'), :name => @tag.name)
+    
     respond_to do |format|
-      format.html {
-        if success
-          flash[:notice] = I18n.t('tag_followings.destroy.success', :name => params[:name])
-        else
-          flash[:error] = I18n.t('tag_followings.destroy.failure', :name => params[:name])
-        end
-        redirect_to tag_path(:name => params[:name])  
+      format.html { 
+        flash[(success ? :notice : :error)] = msg
+        redirect_to destination
       }
-      format.js { 
-        @data = {
-          :action => 'destroy',
-          :success => success ? '1' : '0',
-          :msg => I18n.t(success ? 'tags.wasnt_that_interesting' : 'tag_followings.destroy.failure')
-        }
+      format.js {
+        @data = { :action => action, :success => success ? '1' : '0', :msg => msg }
         render 'tags/update'
       }
     end

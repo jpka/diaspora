@@ -1,21 +1,31 @@
 var success = ("<%= escape_javascript(@data[:success]) %>" === "1" ? true : false);
+
 if (success) {
 	var action = ("<%= escape_javascript(@data[:action]) %>");
 	var tag_selector = "#tag-following-<%= escape_javascript(@tag[:name]) %>";
+
 	if (action == "create") {
-		var listing = $("<div/>").html("<%= escape_javascript(render 'tags/followed_tags_listings') %>");
-		var tag = listing.find(tag_selector);
-		tag.hide();
-  	var ul = $("#followed_tags_listing ul.sub_nav");
+
+		var listing = $("<%= escape_javascript(render 'tags/followed_tags_listings') %>");
+
+  	var tag = listing.find(tag_selector)
+    tag.hide();
+
+    var ul = $("#followed_tags_listing ul.sub_nav");
   	ul.find("li.unfollow").remove();
   	ul.prepend(listing.find("li.unfollow"));
+
   	tag.slideDown(100);
+
 	} else if (action == "destroy") {
-	  $("#followed_tags_listing").find("#tag-following-<%= escape_javascript(@tag[:name]) %>").slideUp(100, function() {
+
+	  $("#followed_tags_listing").find(tag_selector).slideUp(100, function() {
     		$(this).remove();
 		});
+
 	}
 }
+
 Diaspora.page.flashMessages.render({
   success: success,
   notice: "<%= escape_javascript(@data[:msg]) %>"
